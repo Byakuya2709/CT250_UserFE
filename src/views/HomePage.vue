@@ -42,6 +42,9 @@ export default {
         console.error(error);
       }
     },
+    toDetail(eventId) {
+      this.$router.push({ path: `/events/${eventId}` });
+    },
     calculateAverageRating(eventRatingStart) {
       if (!eventRatingStart) return 0;
 
@@ -121,7 +124,9 @@ export default {
                 }}<br />💰
                 <strong>{{ event.eventPrice.toLocaleString() }} VND</strong>
               </p>
-              <a href="#" class="btn btn-primary">Xem chi tiết</a>
+              <button class="btn btn-primary" @click="toDetail(event.eventId)">
+                Xem chi tiết
+              </button>
             </div>
           </div>
         </div>
@@ -167,7 +172,9 @@ export default {
                 }}<br />
                 💰 <strong>{{ event.eventPrice.toLocaleString() }} VND</strong>
               </p>
-              <a href="#" class="btn btn-success">Xem chi tiết</a>
+              <button class="btn btn-primary" @click="toDetail(event.eventId)">
+                Xem chi tiết
+              </button>
             </div>
           </div>
         </div>

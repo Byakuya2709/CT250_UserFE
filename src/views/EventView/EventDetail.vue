@@ -96,36 +96,6 @@
               <span class="fw-bold">{{ event.eventStatus }}</span>
             </li>
           </ul>
-          <button
-            class="btn btn-primary"
-            :disabled="!canUpdateZone"
-            @click="isModalOpen = true"
-            :title="
-              !canUpdateZone
-                ? 'Chỉ được cập nhật zone trước 7 ngày trước khi sự kiện bắt đầu'
-                : ''
-            "
-          >
-            Cập nhật Zone
-          </button>
-          <router-link
-            :to="{
-              name: 'EventUpdate',
-              params: {
-                eventId: event.eventId,
-                companyId: event.eventCompanyId,
-              },
-            }"
-            class="btn btn-primary position-relative"
-            :class="{ disabled: !canUpdateZone }"
-            v-tooltip="
-              !canUpdateZone
-                ? 'Chỉ được cập nhật trước 7 ngày trước khi sự kiện bắt đầu'
-                : ''
-            "
-          >
-            <i class="fas fa-edit"></i> Cập nhật Sự Kiện
-          </router-link>
         </div>
       </div>
     </div>
@@ -189,12 +159,6 @@
         </div>
       </div>
     </div>
-
-    <UpdateZoneModal
-      :eventId="event.eventId"
-      :isModalOpen="isModalOpen"
-      @close="isModalOpen = false"
-    />
     <!-- Modal đặt vé -->
     <EventBooking
       v-if="showModal"
@@ -217,14 +181,12 @@ import "swiper/swiper-bundle.css";
 import { api } from "@/api/Api";
 import EventBooking from "@/views/EventView/EventBooking.vue";
 import EventBookingAllDay from "@/views/EventView/EventBookingAllDay.vue";
-import UpdateZoneModal from "@/views/EventView/UpdateZoneModal.vue";
 export default {
   components: {
     Swiper,
     SwiperSlide,
     EventBooking,
     EventBookingAllDay,
-    UpdateZoneModal,
   },
   data() {
     return {
@@ -373,15 +335,6 @@ export default {
           (capacity) => capacity || Infinity
         )
       );
-    },
-    // Cho phép cập nhật Zone nếu sự kiện cách hiện tại hơn 7 ngày
-    canUpdateZone() {
-      if (!this.event || !this.event.eventStartDate) return false;
-      const now = new Date();
-      const eventDate = new Date(this.event.eventStartDate);
-      const diffTime = eventDate.getTime() - now.getTime();
-      const diffDays = diffTime / (1000 * 3600 * 24);
-      return diffDays > 7;
     },
     // Cho phép mua vé nếu thời gian còn lại từ 0 đến 7 ngày trước khi sự kiện bắt đầu
     canPurchaseTicket() {

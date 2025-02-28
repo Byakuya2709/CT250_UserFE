@@ -18,9 +18,15 @@ const router = createRouter({
 
     {
       path: "/events",
-      name: "ViewEnvents",
+      name: "ViewEvents",
       component: () => import("../views/HomePage.vue"),
       meta: { requiresAuth: false },
+    },
+    {
+      path: "/events/:eventId",
+      name: "EventDetail",
+      component: () => import("../views/EventView/EventDetail.vue"),
+      meta: { requiresAuth: true, role: "USER" },
     },
     {
       path: "/users/signup",
@@ -47,16 +53,29 @@ const router = createRouter({
       meta: { requiresAuth: true, role: "USER" },
     },
     {
-      path: "/users",
+      path: "/user",
       name: "Users",
       component: () => import("../views/UserView.vue"),
       meta: { requiresAuth: true, role: "USER" },
+
+      children: [
+        {
+          path: ":userId/tickets",
+          name: "PurchasedTickets",
+          component: () => import("../views/UserView/BoughtTicket.vue"),
+          meta: { requiresAuth: true, role: "USER" },
+        },
+      ]
     },
 
   ]
 });
 
+
+import { useToast } from "vue-toastification";
+const toast = useToast();
 router.beforeEach((to, from, next) => {
+
   if (to.meta.requiresAuth) {
     console.log("🔒 This route requires authentication");
 
@@ -72,18 +91,22 @@ router.beforeEach((to, from, next) => {
         console.log("👤 User Role:", userRole);
 
         if (to.meta.role && to.meta.role !== userRole) {
-          console.warn("⛔ Không đủ quyền, chuyển về home");
+          console.error("⛔ Không đủ quyền, chuyển về home");
+          toast.warning("Bạn Không đủ quyền để sử dụng tính năng này.")
           return next({ name: "home" });
+
         }
 
         return next();
       } catch (error) {
         console.error("⚠️ Token không hợp lệ:", error);
-        Cookies.remove("token"); // Xóa token lỗi
+        cookies.remove("token"); // Xóa token lỗi
+        toast.info("Phiên đăng nhập của bạn kết thúc.")
         return next({ name: "Login" });
       }
     } else {
       console.warn("🔴 Không tìm thấy token, chuyển về login");
+      toast.info("Bạn phải đăng nhập để sử dụng đầy đủ tính năng trang web.")
       return next({ name: "Login" });
     }
   } else {
