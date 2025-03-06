@@ -49,12 +49,14 @@
 
 <script>
 import { api } from "../api/Api";
-
+import { useCookies } from "vue3-cookies";
+const { cookies } = useCookies(); // Lấy cookie API
 export default {
   name: "User",
   data() {
     return {
       userInfo: {},
+      email: "",
     };
   },
   computed: {
@@ -93,11 +95,21 @@ export default {
         const res = await api.get(`/users/${this.user.id}`);
         console.log(res.data);
         this.userInfo = res.data.data;
+        this.email = cookies.get("email");
+        sessionStorage.setItem("email", this.userInfo.userName);
+        this.$route.meta.userInfo = this.userInfo;
       } catch (error) {
-        this.$toast.error(
-          error.response?.data?.message ||
-            "Đã xảy ra lỗi khi tải thông tin người dùng"
-        );
+        if (error.response?.status === 404) {
+          this.$toast.error("Chưa có thông tin người dùng, hãy tạo mới!");
+          this.$router.push({
+            name: "CreateUser",
+            query: { accountId: this.user.id },
+          });
+        } else {
+          this.$toast.error(
+            error.message || "Đã xảy ra lỗi khi tải thông tin người dùng"
+          );
+        }
       }
     },
   },

@@ -9,13 +9,23 @@ export default {
       eventsByTag: {},
       loading: true,
       error: null,
+      eventInCurrentMonth: [],
     };
   },
   methods: {
     async fetchTopRatedEvents() {
       try {
-        const response = await api.get("/events/top-rated");
+        const response = await api.get("/public/top-rated");
         this.topRatedEvents = response.data;
+      } catch (error) {
+        this.error = "Lỗi khi lấy danh sách sự kiện top-rated";
+        console.error(error);
+      }
+    },
+    async fetchCurrentMonthEvents() {
+      try {
+        const response = await api.get("/public/current-month");
+        this.eventInCurrentMonth = response.data.data;
       } catch (error) {
         this.error = "Lỗi khi lấy danh sách sự kiện top-rated";
         console.error(error);
@@ -24,7 +34,7 @@ export default {
     async fetchEventsByTag() {
       try {
         const requests = eventTags.map((tag) =>
-          api.get(`/events/tag`, { params: { tag: tag.value } })
+          api.get(`/public/tag`, { params: { tag: tag.value } })
         );
 
         const responses = await Promise.allSettled(requests);
@@ -43,7 +53,7 @@ export default {
       }
     },
     toDetail(eventId) {
-      this.$router.push({ path: `/events/${eventId}` });
+      this.$router.push({ path: `/event/${eventId}` });
     },
     calculateAverageRating(eventRatingStart) {
       if (!eventRatingStart) return 0;
@@ -63,6 +73,7 @@ export default {
   async mounted() {
     await this.fetchTopRatedEvents();
     await this.fetchEventsByTag();
+    await this.fetchCurrentMonthEvents();
     this.loading = false;
   },
 };
@@ -70,7 +81,9 @@ export default {
 
 <template>
   <div class="container mt-4">
-    <h2 class="mb-3 text-primary">🔥 Top Rated Events</h2>
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+      Những sự kiện sắp diễn ra
+    </h2>
 
     <div v-if="loading" class="d-flex justify-content-center">
       <div class="spinner-border text-primary" role="status"></div>
@@ -149,32 +162,105 @@ export default {
       </div>
     </div>
 
-    <!-- 🎭 Events by Tag -->
-    <div v-for="(events, tag) in eventsByTag" :key="tag" class="mt-5">
-      <h2 class="text-success">{{ tag }}</h2>
-      <div v-if="events.length === 0" class="alert alert-warning">
-        Không có sự kiện
-      </div>
+    <div
+      v-if="eventInCurrentMonth.length"
+      class="mt-8 bg-gray-100 py-8 px-4 rounded-lg"
+    >
+      <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+        Sự kiện trong tháng ({{ eventInCurrentMonth.length }})
+      </h2>
 
-      <div class="row">
-        <div v-for="event in events" :key="event.eventId" class="col-md-4 mb-4">
-          <div class="card shadow-sm">
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+      >
+        <div
+          v-for="event in eventInCurrentMonth"
+          :key="event.eventTitle + event.eventAddress"
+          @click="toDetail(event.eventId)"
+          class="group relative bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-blue-500"
+        >
+          <!-- Hiệu ứng nền khi hover -->
+          <div
+            class="absolute inset-0 bg-blue-100 opacity-0 transition-opacity duration-300 group-hover:opacity-30"
+          ></div>
+
+          <img
+            :src="
+              event.eventListImgURL ||
+              'https://res.cloudinary.com/dtza0pk4w/image/upload/v1736700339/mbs_ortxmh.jpg'
+            "
+            class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+            alt="Event Image"
+          />
+          <div
+            class="p-4 space-y-2 relative z-10 transition-colors duration-300 group-hover:bg-blue-50"
+          >
+            <h5
+              class="text-lg font-medium text-gray-900 truncate transition-colors duration-300 group-hover:text-blue-600"
+            >
+              {{ event.eventTitle }}
+            </h5>
+            <p
+              class="text-sm text-gray-600 transition-colors duration-300 group-hover:text-gray-800"
+            >
+              📅 {{ new Date(event.eventStartDate).toLocaleDateString() }}
+              <br />📍 {{ event.eventAddress }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else class="text-center text-gray-500 text-base mt-6">
+      Không có sự kiện nào trong tháng này.
+    </div>
+
+    <!-- 🎭 Events by Tag -->
+    <div
+      v-for="(events, tag) in eventsByTag"
+      :key="tag"
+      class="mt-8 bg-gray-100 px-4 rounded-lg"
+    >
+      <div v-if="events.length">
+        <h2
+          class="text-2xl font-semibold text-gray-800 mb-6"
+          style="padding-top: 1%"
+        >
+          {{ tag }} ({{ events.length }})
+        </h2>
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+        >
+          <div
+            v-for="event in events"
+            :key="event.eventId"
+            @click="toDetail(event.eventId)"
+            class="group relative bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-blue-500"
+          >
+            <!-- Hiệu ứng nền khi hover -->
+            <div
+              class="absolute inset-0 bg-blue-100 opacity-0 transition-opacity duration-300 group-hover:opacity-30"
+            ></div>
+
             <img
               :src="event.eventListImgURL[0]"
-              class="card-img-top"
+              class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
               alt="Event Image"
             />
-            <div class="card-body">
-              <h5 class="card-title">{{ event.eventTitle }}</h5>
-              <p class="card-text">
-                📍 {{ event.eventAddress }}<br />
-                📅 {{ new Date(event.eventStartDate).toLocaleDateString()
-                }}<br />
-                💰 <strong>{{ event.eventPrice.toLocaleString() }} VND</strong>
+            <div
+              class="p-4 space-y-2 relative z-10 transition-colors duration-300 group-hover:bg-blue-50"
+            >
+              <h5
+                class="text-lg font-medium text-gray-900 truncate transition-colors duration-300 group-hover:text-blue-600"
+              >
+                {{ event.eventTitle }}
+              </h5>
+              <p
+                class="text-sm text-gray-600 transition-colors duration-300 group-hover:text-gray-800"
+              >
+                📅 {{ new Date(event.eventStartDate).toLocaleDateString() }}
+                <br />📍 {{ event.eventAddress }}
               </p>
-              <button class="btn btn-primary" @click="toDetail(event.eventId)">
-                Xem chi tiết
-              </button>
             </div>
           </div>
         </div>

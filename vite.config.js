@@ -14,11 +14,7 @@ export default defineConfig({
     }
   },
   css: {
-    postcss: {
-      plugins: [
-        // Các plugin PostCSS, nếu có
-      ]
-    }
+    postcss: './postcss.config.js',
   },
 
   server: {

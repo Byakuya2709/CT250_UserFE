@@ -12,7 +12,7 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: HomeView,
+      component: () => import("../views/HomePage.vue"),
       meta: { requiresAuth: false },
     },
 
@@ -48,7 +48,7 @@ const router = createRouter({
     },
     {
       path: "/users/create",
-      name: "CreateCompany",
+      name: "CreateUser",
       component: () => import("../views/CreateUserProfile.vue"),
       meta: { requiresAuth: true, role: "USER" },
     },

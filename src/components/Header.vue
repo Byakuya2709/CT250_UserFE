@@ -1,169 +1,144 @@
 <template>
-  <header id="header">
-    <nav
-      class="navbar navbar-expand-lg bg-body-tertiary"
-      style="background-color: var(--header-be) !important"
-    >
-      <div class="container-fluid">
-        <router-link class="logo-brand" to="/">
-          <span
-            ><p>{{ isAdmin ? "ADMIN" : "COMPANY" }}</p></span
-          >
-        </router-link>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#main-nav"
-          aria-controls="offcanvasNavbar2"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div
-          class="offcanvas offcanvas-end offcanvas-size-sm"
-          id="main-nav"
-          tabindex="-1"
-          aria-labelledby="offcanvasNavbar2"
-        >
-          <div class="offcanvas-header">
-            <h5 class="offcanvas-title logo-brand" id="offcanvasNavbarLabel">
-              {{ isAdmin ? "ADMIN" : "COMPANY" }}
-            </h5>
-
-            <button
-              type="button"
-              class="btn-close btn-close-white"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="offcanvas-body">
-            <ul class="navbar-nav ms-4">
-              <!-- <li class="menu-item">
-                 <div class="dropdown">
-                   <router-link class="menu-link link-active" to="/shop"
-                     >SHOP</router-link
-                   >
-                   <ul class="dropdown-menu">
-                     <li>
-                       <router-link
-                         class="dropdown-item"
-                         to="/shop#list-item-top"
-                         >TOPS</router-link
-                       >
-                     </li>
-                     <li>
-                       <router-link
-                         class="dropdown-item"
-                         to="/shop#list-item-bottom"
-                         >BOTTOMS</router-link
-                       >
-                     </li>
-                     <li>
-                       <router-link
-                         class="dropdown-item"
-                         to="/shop#list-item-asso"
-                         >ACCESSORIES</router-link
-                       >
-                     </li>
-                   </ul>
-                 </div>
-               </li>
-               <li class="menu-item">
-                 <div class="dropdown">
-                   <router-link class="menu-link link-active" to="/bray"
-                     >BRAY</router-link
-                   >
-                 </div>
-               </li>
-               <li class="menu-item">
-                 <div class="dropdown">
-                   <router-link class="menu-link link-active" to="/news"
-                     >NEWS</router-link
-                   >
-                 </div>
-               </li> -->
-
-              <li class="menu-item">
-                <div class="dropdown">
-                  <router-link class="menu-link link-active" to="/events"
-                    >Trang chủ</router-link
-                  >
-                </div>
-              </li>
-
-              <li v-if="!isAuthenticated" class="menu-item">
-                <div class="dropdown">
-                  <router-link class="menu-link link-active" to="/users/signup"
-                    >Tạo tài khoản</router-link
-                  >
-                </div>
-              </li>
-
-              <li v-if="!isAuthenticated" class="menu-item">
-                <div class="dropdown">
-                  <router-link class="menu-link link-active" to="/users/login"
-                    >Đăng nhập</router-link
-                  >
-                </div>
-              </li>
-              <li v-if="isAuthenticated" class="menu-item">
-                <div class="dropdown">
-                  <a class="menu-link link-active" @click.prevent="logout"
-                    >Đăng xuất</a
-                  >
-                </div>
-              </li>
-            </ul>
-            <div class="d-flex">
-              <form
-                id="form-searching"
-                name="form-search"
-                method="get"
-                action="search.html"
-              >
-                <input
-                  onkeypress=""
-                  type="text"
-                  name="textSearch"
-                  placeholder="Search"
-                />
-                <i onclick="" class="fa-solid fa-magnifying-glass"></i>
-              </form>
-              <span class="cart-value">
-                <!-- <router-link to="/cart" class="btn-shopping_cart">
-                   <i class="fa-solid fa-cart-shopping"></i>
-                   <span class="cart-quantity">0</span>
-                 </router-link> -->
-              </span>
-            </div>
-          </div>
-        </div>
+  <header id="header" class="text-white">
+    <nav class="container mx-auto flex items-center justify-between py-4">
+      <!-- Logo -->
+      <router-link
+        class="text-xl font-bold"
+        to="/"
+        style="color: black; font-size: 35px"
+      >
+        USER
+      </router-link>
+      <!-- Search Bar -->
+      <div class="relative w-1/3">
+        <input
+          type="text"
+          name="textSearch"
+          placeholder="Search"
+          class="w-full p-2 pl-4 pr-10 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <i
+          class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-gray-400"
+        ></i>
       </div>
+      <!-- Thanh menu hiển thị trên PC -->
+      <ul class="hidden md:flex items-center space-x-4">
+        <li v-if="isAuthenticated">
+          <router-link class="hover:text-blue-400" to="/user">
+            Trang Cá Nhân
+          </router-link>
+        </li>
+        <li v-if="!isAuthenticated">
+          <router-link class="hover:text-blue-400" to="/users/signup"
+            >Tạo tài khoản</router-link
+          >
+        </li>
+        <li v-if="!isAuthenticated">
+          <router-link class="hover:text-blue-400" to="/users/login"
+            >Đăng nhập</router-link
+          >
+        </li>
+        <!-- <li>
+          <router-link class="hover:text-blue-400" to="/about"
+            >About</router-link
+          >
+        </li> -->
+        <li v-if="isAuthenticated">
+          <a class="hover:text-red-400 cursor-pointer" @click.prevent="logout"
+            >Đăng xuất</a
+          >
+        </li>
+      </ul>
+
+      <!-- Nút menu cho Mobile -->
+      <button class="md:hidden text-white text-2xl" @click="toggleMenu">
+        <i :class="isMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'"></i>
+      </button>
     </nav>
+
+    <!-- Sidebar ẩn bên phải (chỉ hiển thị trên mobile) -->
+    <transition name="slide">
+      <div
+        v-if="isMenuOpen"
+        class="fixed top-0 right-0 w-2/3 h-full bg-white text-black p-6 shadow-lg z-50 md:hidden"
+      >
+        <button class="absolute top-4 right-4 text-2xl" @click="toggleMenu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <ul class="space-y-4 mt-10">
+          <li v-if="isAuthenticated">
+            <router-link
+              class="hover:text-blue-400"
+              :to="isAdmin ? '/admin' : '/company'"
+            >
+              {{ isAdmin ? "ADMIN Dashboard" : "Dashboard" }}
+            </router-link>
+          </li>
+          <li v-if="!isAuthenticated">
+            <router-link class="hover:text-blue-400" to="/company/signup"
+              >Tạo tài khoản</router-link
+            >
+          </li>
+          <li v-if="!isAuthenticated">
+            <router-link class="hover:text-blue-400" to="/company/login"
+              >Đăng nhập</router-link
+            >
+          </li>
+          <li v-if="!isAuthenticated">
+            <router-link class="hover:text-blue-400" to="/admin/login"
+              >Đăng nhập ADMIN</router-link
+            >
+          </li>
+          <li>
+            <router-link class="hover:text-blue-400" to="/about"
+              >About</router-link
+            >
+          </li>
+          <li v-if="isAuthenticated">
+            <a class="hover:text-red-400 cursor-pointer" @click.prevent="logout"
+              >Đăng xuất</a
+            >
+          </li>
+        </ul>
+        <ul class="mt-3">
+          <input
+            type="text"
+            name="textSearch"
+            placeholder="Search"
+            class="w-full p-2 pl-4 pr-10 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <i
+            class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-gray-400"
+          ></i>
+        </ul>
+      </div>
+    </transition>
   </header>
 </template>
 
-<style></style>
-
 <script>
 import { useAuthStore } from "../stores/pina";
-import { useRouter } from "vue-router";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 export default {
   name: "Header",
   setup() {
     const authStore = useAuthStore();
-    const router = useRouter();
 
     const isAuthenticated = computed(() => authStore.isAuthenticated);
     const isAdmin = computed(() => authStore.isAdmin);
 
+    const isMenuOpen = ref(false);
+
+    const toggleMenu = () => {
+      isMenuOpen.value = !isMenuOpen.value;
+    };
+
     const logout = async () => {
       try {
         await authStore.logout();
+        isMenuOpen.value = false;
       } catch (error) {
         this.$toast.error(error);
       }
@@ -172,8 +147,22 @@ export default {
     return {
       isAuthenticated,
       isAdmin,
+      isMenuOpen,
+      toggleMenu,
       logout,
     };
   },
 };
 </script>
+
+<style scoped>
+/* Hiệu ứng trượt */
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease-in-out;
+}
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
+}
+</style>
