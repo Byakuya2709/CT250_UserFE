@@ -239,7 +239,7 @@ export default {
     async fetchEventData() {
       this.loading = true;
       try {
-        const response = await api.get(`/events/${this.eventId}`);
+        const response = await api.get(`/public/${this.eventId}`);
         this.event = response.data.data;
       } catch (error) {
         console.error("Error fetching event data:", error);
@@ -278,7 +278,9 @@ export default {
       this.selectedTicket = null;
 
       // Quay lại trang event chính
-      this.$router.push({ name: "EventDetails" });
+      this.$router.push({
+        path: `/events/${this.event.eventId}`,
+      });
     },
     calculateAverageRating(event) {
       let totalReviews = 0;

@@ -19,7 +19,7 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: HomeView,
+      component: () => import("../views/HomePage.vue"),
       meta: { requiresAuth: false },
     },
 
@@ -33,7 +33,21 @@ const router = createRouter({
       path: "/events/:eventId",
       name: "EventDetail",
       component: () => import("../views/EventView/EventDetail.vue"),
-      meta: { requiresAuth: true, role: "USER" },
+      meta: { requiresAuth: false },
+      children: [
+        {
+          path: "booking",
+          name: "EventBooking",
+          component: () => import("../views/EventView/EventBooking.vue"),
+          meta: { modal: true, requiresAuth: true, role: "USER" }, // Đánh dấu route này là modal
+        },
+        {
+          path: "booking/all-day",
+          name: "EventBookingAllDay",
+          component: () => import("../views/EventView/EventBookingAllDay.vue"),
+          meta: { modal: true, requiresAuth: true, role: "USER" },
+        },
+      ],
     },
     {
       path: "/users/signup",
