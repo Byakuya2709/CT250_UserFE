@@ -51,7 +51,7 @@ export const useAuthStore = defineStore("auth", {
 
         cookies.set('email',decodedToken.sub,expiresInSeconds + "s")
         
-        sessionStorage.setItem('email', decodedToken.sub);
+        sessionStorage.setItem('UserEmail', decodedToken.sub);
         return { loginResponse: response, role: this.role };
       } catch (err) {
         cookies.remove("token");
@@ -66,7 +66,7 @@ export const useAuthStore = defineStore("auth", {
         user: { id: null, email: "" },
         role: null,
       });
-      sessionStorage.removeItem('email');
+      sessionStorage.removeItem('UserEmail');
       cookies.remove("token");
       cookies.remove("email");
       toast.info("Đang đăng xuất...");

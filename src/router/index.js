@@ -9,15 +9,16 @@ const { cookies } = useCookies(); // Lấy cookies API
 const router = createRouter({
   history: createWebHistory(), // Cấu hình sử dụng history mode
   routes: [
-    {
-      path: "/",
-      name: "home",
-      component: HomeView,
-      meta: { requiresAuth: false },
-    },
+    // {
+    //   path: "/",
+    //   name: "home",
+    //   component: HomeView,
+    //   meta: { requiresAuth: false },
+    // },
 
     {
-      path: "/events",
+      path: "/",
+      alias:"/events",
       name: "ViewEvents",
       component: () => import("../views/HomePage.vue"),
       meta: { requiresAuth: false },
@@ -48,7 +49,7 @@ const router = createRouter({
     },
     {
       path: "/users/create",
-      name: "CreateCompany",
+      name: "CreateUser",
       component: () => import("../views/CreateUserProfile.vue"),
       meta: { requiresAuth: true, role: "USER" },
     },
@@ -56,26 +57,28 @@ const router = createRouter({
       path: "/user",
       name: "Users",
       component: () => import("../views/UserView.vue"),
-      meta: { requiresAuth: true, role: "USER" },
+      meta: { requiresAuth: true, role: "USER", userInfo: null },
 
       children: [
+        {
+          path: ":userId/profile",
+          name: "UserProfile",
+          component: () => import("../views/UserView/UserProfile.vue"),
+          props: (route) => ({ userInfo: route.meta.userInfo }),
+        },
         {
           path: ":userId/tickets",
           name: "PurchasedTickets",
           component: () => import("../views/UserView/BoughtTicket.vue"),
-          meta: { requiresAuth: true, role: "USER" },
         },
-      ]
+      ],
     },
-
-  ]
+  ],
 });
-
 
 import { useToast } from "vue-toastification";
 const toast = useToast();
 router.beforeEach((to, from, next) => {
-
   if (to.meta.requiresAuth) {
     console.log("🔒 This route requires authentication");
 
@@ -92,21 +95,20 @@ router.beforeEach((to, from, next) => {
 
         if (to.meta.role && to.meta.role !== userRole) {
           console.error("⛔ Không đủ quyền, chuyển về home");
-          toast.warning("Bạn Không đủ quyền để sử dụng tính năng này.")
+          toast.warning("Bạn Không đủ quyền để sử dụng tính năng này.");
           return next({ name: "home" });
-
         }
 
         return next();
       } catch (error) {
         console.error("⚠️ Token không hợp lệ:", error);
         cookies.remove("token"); // Xóa token lỗi
-        toast.info("Phiên đăng nhập của bạn kết thúc.")
+        toast.info("Phiên đăng nhập của bạn kết thúc.");
         return next({ name: "Login" });
       }
     } else {
       console.warn("🔴 Không tìm thấy token, chuyển về login");
-      toast.info("Bạn phải đăng nhập để sử dụng đầy đủ tính năng trang web.")
+      toast.info("Bạn phải đăng nhập để sử dụng đầy đủ tính năng trang web.");
       return next({ name: "Login" });
     }
   } else {

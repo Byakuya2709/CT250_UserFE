@@ -98,7 +98,7 @@ export default {
     return {
       user: {
         userName: "",
-        userMail: sessionStorage.getItem("email") || "lỗi",
+        userMail: sessionStorage.getItem("UserEmail"),
         userPhone: "",
         userGender: "MALE",
         userAddress: "",

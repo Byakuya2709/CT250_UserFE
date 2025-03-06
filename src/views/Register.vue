@@ -147,7 +147,7 @@ export default {
           const response = await api.post("/auth/register", user);
           if (response.status === 201) {
             this.$toast.success(response.data.message);
-            sessionStorage.setItem("email", this.email);
+            sessionStorage.setItem("UserEmail", this.email);
 
             const login = {
               email: this.email,
@@ -157,7 +157,7 @@ export default {
             const authStore = useAuthStore();
             const { loginResponse, role } = await authStore.login(
               login,
-              "users"
+              "user"
             );
             console.log(loginResponse);
             console.log(role);
@@ -165,7 +165,7 @@ export default {
             if (loginResponse.status === 200) {
               this.$toast.success(loginResponse.data.message);
               this.$router.push({
-                path: `/${this.role.toLocaleLowerCase()}/create`,
+                path: `/${this.role.toLocaleLowerCase()}s/create`,
                 query: { accountId: response.data.data.id },
               });
             } else {

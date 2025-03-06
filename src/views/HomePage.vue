@@ -9,13 +9,23 @@ export default {
       eventsByTag: {},
       loading: true,
       error: null,
+      eventInCurrentMonth: [],
     };
   },
   methods: {
     async fetchTopRatedEvents() {
       try {
-        const response = await api.get("/events/top-rated");
+        const response = await api.get("/public/top-rated");
         this.topRatedEvents = response.data;
+      } catch (error) {
+        this.error = "Lỗi khi lấy danh sách sự kiện top-rated";
+        console.error(error);
+      }
+    },
+    async fetchCurrentMonthEvents() {
+      try {
+        const response = await api.get("/public/current-month");
+        this.eventInCurrentMonth = response.data.data;
       } catch (error) {
         this.error = "Lỗi khi lấy danh sách sự kiện top-rated";
         console.error(error);
@@ -24,7 +34,7 @@ export default {
     async fetchEventsByTag() {
       try {
         const requests = eventTags.map((tag) =>
-          api.get(`/events/tag`, { params: { tag: tag.value } })
+          api.get(`/public/tag`, { params: { tag: tag.value } })
         );
 
         const responses = await Promise.allSettled(requests);
@@ -43,7 +53,7 @@ export default {
       }
     },
     toDetail(eventId) {
-      this.$router.push({ path: `/events/${eventId}` });
+      this.$router.push({ path: `/public/${eventId}` });
     },
     calculateAverageRating(eventRatingStart) {
       if (!eventRatingStart) return 0;
@@ -63,6 +73,7 @@ export default {
   async mounted() {
     await this.fetchTopRatedEvents();
     await this.fetchEventsByTag();
+    await this.fetchCurrentMonthEvents()
     this.loading = false;
   },
 };
@@ -70,7 +81,7 @@ export default {
 
 <template>
   <div class="container mt-4">
-    <h2 class="mb-3 text-primary">🔥 Top Rated Events</h2>
+    <h2 class="mb-3 text-primary">Những sự kiện sắp diễn ra</h2>
 
     <div v-if="loading" class="d-flex justify-content-center">
       <div class="spinner-border text-primary" role="status"></div>
@@ -149,29 +160,62 @@ export default {
       </div>
     </div>
 
+    <div v-if="eventInCurrentMonth.length!=0" class="row mt-5" > 
+      <h2 class="text-success">Sự kiện sắp diễn ra trong tháng</h2>
+    <div
+      v-for="event in eventInCurrentMonth"
+      :key="event.eventTitle + event.eventAddress"
+     class="col-sm-3 mb-4"
+    > 
+      <div class="card shadow-sm">
+        <img
+          :src="
+            event.eventListImgURL ||
+            `https://res.cloudinary.com/dtza0pk4w/image/upload/v1736700339/mbs_ortxmh.jpg`
+          "
+          class="card-img-top"
+          alt="Event Image"
+        />
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ event.eventTitle }}</h5>
+          <p class="card-text">
+            <!-- 📍 {{ event.eventAddress }}<br /> -->
+            📅 {{ new Date(event.eventStartDate).toLocaleDateString() }}
+            <br>
+            {{ event.eventAddress }}
+          </p>
+          <button class="btn btn-primary" @click="toDetail(event.eventId)">
+            Xem chi tiết
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div v-else> Không có sự kiện nào diễn ra trong tháng này</div>
     <!-- 🎭 Events by Tag -->
     <div v-for="(events, tag) in eventsByTag" :key="tag" class="mt-5">
-      <h2 class="text-success">{{ tag }}</h2>
-      <div v-if="events.length === 0" class="alert alert-warning">
-        Không có sự kiện
-      </div>
+      <!-- <div v-if="events.length === 0" class="alert alert-warning">
+        Không có sự kiện nào đang mở bán vé
+      </div> -->
 
-      <div class="row">
-        <div v-for="event in events" :key="event.eventId" class="col-md-4 mb-4">
+      <div v-if="events.length != 0" class="row">
+        <h2 class="text-success">{{ tag }}</h2>
+        <div v-for="event in events" :key="event.eventId" class="col-sm-3 mb-4">
           <div class="card shadow-sm">
             <img
               :src="event.eventListImgURL[0]"
               class="card-img-top"
               alt="Event Image"
             />
-            <div class="card-body">
+            <div class="card-body d-flex flex-column">
               <h5 class="card-title">{{ event.eventTitle }}</h5>
               <p class="card-text">
-                📍 {{ event.eventAddress }}<br />
-                📅 {{ new Date(event.eventStartDate).toLocaleDateString()
-                }}<br />
-                💰 <strong>{{ event.eventPrice.toLocaleString() }} VND</strong>
+                <!-- 📍 {{ event.eventAddress }}<br /> -->
+                📅 {{ new Date(event.eventStartDate).toLocaleDateString() }}
+                <br>
+                {{ event.eventAddress }}
               </p>
+              
               <button class="btn btn-primary" @click="toDetail(event.eventId)">
                 Xem chi tiết
               </button>

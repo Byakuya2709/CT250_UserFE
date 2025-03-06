@@ -122,7 +122,7 @@ export default {
             this.failedAttempts = 0;
             sessionStorage.removeItem("failedAttempts");
             this.$toast.success(loginResponse.data.message);
-            this.$router.replace({ name: "Users" });
+            this.$router.replace({ path:"/user"});
           } else {
             this.handleFailedAttempt();
           }

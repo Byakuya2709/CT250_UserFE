@@ -41,20 +41,22 @@
       </div>
     </div>
 
-    <div class="container col-10" style="margin-left: 10px">
-      <RouterView />
+    <div class="container" style="margin-left: 10px">
+      <RouterView :userInfo="userInfo" />
     </div>
   </div>
 </template>
 
 <script>
 import { api } from "../api/Api";
-
+import { useCookies } from "vue3-cookies";
+const { cookies } = useCookies(); // Lấy cookie API
 export default {
   name: "User",
   data() {
     return {
       userInfo: {},
+      email: "",
     };
   },
   computed: {
@@ -68,7 +70,7 @@ export default {
       return [
         {
           name: "Thông Tin Tài Khoản",
-          path: "/user/profile",
+          path: `/user/${this.user.id}/profile`,
           iconPath:
             "M8 3.5a.5.5 0 0 1 .5.5v4h3.5a.5.5 0 0 1 0 1H8a.5.5 0 0 1-.5-.5V4a.5.5 0 0 1 .5-.5z M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zM1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8z",
         },
@@ -78,12 +80,12 @@ export default {
           iconPath:
             "M2 3.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1.5h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1h1zm11-1V2a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v.5H2v10h12v-10h-1z M9 8H7v4h2V8zm1-3H6v2h4V5z",
         },
-        {
-          name: "Quản Lý Công Việc",
-          path: "/user/all-request",
-          iconPath:
-            "M2 3.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1.5h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1h1zm11-1V2a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v.5H2v10h12v-10h-1z M9 8H7v4h2V8zm1-3H6v2h4V5z",
-        },
+        // {
+        //   name: "Quản Lý Công Việc",
+        //   path: "/user/all-request",
+        //   iconPath:
+        //     "M2 3.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1.5h1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1h1zm11-1V2a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v.5H2v10h12v-10h-1z M9 8H7v4h2V8zm1-3H6v2h4V5z",
+        // },
       ];
     },
   },
@@ -93,11 +95,21 @@ export default {
         const res = await api.get(`/users/${this.user.id}`);
         console.log(res.data);
         this.userInfo = res.data.data;
+        this.email = cookies.get("email");
       } catch (error) {
-        this.$toast.error(
-          error.response?.data?.message ||
-            "Đã xảy ra lỗi khi tải thông tin người dùng"
-        );
+        if (error.response?.status === 404) {
+          this.$toast.error("Chưa có thông tin người dùng, hãy tạo mới!");
+          this.$router.push({
+            name: "CreateUser",
+            query: { accountId: this.user.id },
+          });
+        } else {
+          console.log(error)
+          this.$toast.error(
+            error.response?.data?.message ||
+              "Đã xảy ra lỗi khi tải thông tin người dùng"
+          );
+        }
       }
     },
   },
