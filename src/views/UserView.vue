@@ -95,21 +95,11 @@ export default {
         const res = await api.get(`/users/${this.user.id}`);
         console.log(res.data);
         this.userInfo = res.data.data;
-        this.email = cookies.get("email");
       } catch (error) {
-        if (error.response?.status === 404) {
-          this.$toast.error("Chưa có thông tin người dùng, hãy tạo mới!");
-          this.$router.push({
-            name: "CreateUser",
-            query: { accountId: this.user.id },
-          });
-        } else {
-          console.log(error)
-          this.$toast.error(
-            error.response?.data?.message ||
-              "Đã xảy ra lỗi khi tải thông tin người dùng"
-          );
-        }
+        this.$toast.error(
+          error.response?.data?.message ||
+            "Đã xảy ra lỗi khi tải thông tin người dùng"
+        );
       }
     },
   },

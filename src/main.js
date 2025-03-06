@@ -31,7 +31,7 @@ import {
 
 // Đăng ký tất cả thành phần cần thiết
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
-
+import './index.css'
 
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";

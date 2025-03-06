@@ -18,7 +18,13 @@ const router = createRouter({
 
     {
       path: "/",
-      alias:"/events",
+      name: "home",
+      component: HomeView,
+      meta: { requiresAuth: false },
+    },
+
+    {
+      path: "/events",
       name: "ViewEvents",
       component: () => import("../views/HomePage.vue"),
       meta: { requiresAuth: false },
