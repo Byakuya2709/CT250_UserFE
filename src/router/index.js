@@ -49,6 +49,13 @@ const router = createRouter({
         },
       ],
     },
+
+    {
+      path: "/events/:eventId/blogs/:blogId",
+      name: "BlogDetail",
+      component: () => import("../views/EventView/BlogDetail.vue"),
+      meta: { requiresAuth: false }
+    },
     {
       path: "/users/signup",
       name: "register",
