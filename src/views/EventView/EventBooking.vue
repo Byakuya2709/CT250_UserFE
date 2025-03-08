@@ -82,8 +82,8 @@
 </template>
 
 <style scoped>
-p {
-  color: black;
+p,lable,select {
+  color: black!important;
 }
 .modal-overlay {
   position: fixed;

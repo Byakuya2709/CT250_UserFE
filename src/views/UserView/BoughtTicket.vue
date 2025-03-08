@@ -18,14 +18,6 @@
         :key="ticket.ticketId"
         class="p-6 border rounded-lg shadow-md bg-gray-50 relative overflow-hidden"
       >
-        <!-- Thiết kế kiểu vé điện tử -->
-        <div
-          class="absolute top-0 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-gray-200 rounded-full"
-        ></div>
-        <div
-          class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-gray-200 rounded-full"
-        ></div>
-
         <div class="flex justify-between items-center border-b pb-4 mb-4">
           <h3 class="text-2xl font-semibold text-gray-800">VÉ ĐIỆN TỬ</h3>
           <span
@@ -42,36 +34,37 @@
             }}
           </span>
         </div>
-
-        <p class="text-gray-700 text-lg font-medium">
-          Mã Vé:
-          <span class="font-bold text-blue-600">#{{ ticket.ticketId }}</span>
-        </p>
-        <p class="text-gray-700 text-lg font-medium">
-          Giá:
-          <span class="font-bold"
-            >{{ ticket.ticketPrice.toLocaleString() }} VND</span
-          >
-        </p>
-        <p class="text-gray-700 text-lg font-medium">
-          Vị trí: <span class="font-bold">{{ ticket.ticketPosition }}</span>
-        </p>
-        <p class="text-gray-700 text-lg font-medium">
-          Loại vé: <span class="font-bold">{{ ticket.ticketDuration }}</span>
-        </p>
-        <p class="text-gray-700 text-lg font-medium">
-          Ngày hiệu lực:
-          <span class="font-bold">{{
-            formatDate(ticket.ticketDayActive)
-          }}</span>
-        </p>
-        <p class="text-gray-700 text-lg font-medium">
-          Thời gian đặt:
-          <span class="font-bold">{{
-            formatDate(ticket.ticketBookingTime)
-          }}</span>
-        </p>
-
+        <div class="ticket-detail">
+          <div>
+          <p class="text-gray-700 text-lg font-medium">
+            Mã Vé:
+            <span class="font-bold text-blue-600">#{{ ticket.ticketId }}</span>
+          </p>
+          <p class="text-gray-700 text-lg font-medium">
+            Giá:
+            <span class="font-bold"
+              >{{ ticket.ticketPrice.toLocaleString() }} VND</span
+            >
+          </p>
+          <p class="text-gray-700 text-lg font-medium">
+            Vị trí: <span class="font-bold">{{ ticket.ticketPosition }}</span>
+          </p>
+          <p class="text-gray-700 text-lg font-medium">
+            Loại vé: <span class="font-bold">{{ ticket.ticketDuration }}</span>
+          </p>
+          <p class="text-gray-700 text-lg font-medium">
+            Ngày hiệu lực:
+            <span class="font-bold">{{
+              formatDate(ticket.ticketDayActive)
+            }}</span>
+          </p>
+          <p class="text-gray-700 text-lg font-medium">
+            Thời gian đặt:
+            <span class="font-bold">{{
+              formatDate(ticket.ticketBookingTime)
+            }}</span>
+          </p>
+        </div>
         <div class="mt-4 flex justify-center">
           <img
             v-if="ticket.qrCodeBase64"
@@ -81,6 +74,11 @@
           />
           <p v-else class="text-gray-500">Không có QR Code</p>
         </div>
+
+        </div>
+        
+
+        
 
         <div
           v-if="ticket.ticketStatus === 'UNPAID'"
@@ -125,6 +123,11 @@
   </div>
 </template>
 
+<style scoped>
+.ticket-detail{
+  display: flex;
+  justify-content: space-between;
+}</style>
 <script>
 import { api } from "@/api/Api";
 import format from "date-fns/format";

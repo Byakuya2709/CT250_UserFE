@@ -273,6 +273,10 @@ export default {
 };
 </script>
 <style scoped>
+
+p, label, select {
+  color: black!important;
+}
 .modal-overlay {
   position: fixed;
   top: 0;
