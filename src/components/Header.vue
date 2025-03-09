@@ -7,8 +7,9 @@
         to="/"
         style="color: black; font-size: 35px"
       >
-        USER
+      EventHub 
       </router-link>
+
       <!-- Search Bar -->
       <div class="relative w-1/3">
         <input
@@ -23,6 +24,11 @@
       </div>
       <!-- Thanh menu hiển thị trên PC -->
       <ul class="hidden md:flex items-center space-x-4">
+        <li >
+          <router-link class="hover:text-blue-400" to="/events">
+            Trang sự kiện
+          </router-link>
+        </li>
         <li v-if="isAuthenticated">
           <router-link class="hover:text-blue-400" to="/user">
             Trang Cá Nhân

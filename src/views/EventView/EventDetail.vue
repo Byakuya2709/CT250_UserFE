@@ -143,7 +143,7 @@
           <p>
             <strong>ALL_DAY</strong>
           </p>
-          <p>Tổng: {{ event.totalDay }} ngày</p>
+          <p>Tổng: {{ event.totalDay || 1 }} ngày</p>
           <button
             class="book-btn"
             :disabled="!canPurchaseTicket"
@@ -439,7 +439,7 @@ export default {
         : "";
     },
     eventTags() {
-      return this.event?.eventTags?.split("_") || [];
+      return this.event?.eventTags?.split("|") || [];
     },
     totalRemainCapacity() {
       if (!this.event?.eventTicketCapacity) return 0;

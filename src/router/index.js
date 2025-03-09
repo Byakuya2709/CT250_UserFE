@@ -19,7 +19,7 @@ const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: () => import("../views/HomePage.vue"),
+      component: () => import("@/views/HomeView.vue"),
       meta: { requiresAuth: false },
     },
 

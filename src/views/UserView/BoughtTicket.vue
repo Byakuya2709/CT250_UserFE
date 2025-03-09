@@ -25,60 +25,63 @@
             :class="{
               'bg-green-100 text-green-700': ticket.ticketStatus === 'PAID',
               'bg-red-100 text-red-700': ticket.ticketStatus === 'UNPAID',
+              'bg-yellow-100 text-yellow-700':
+                ticket.ticketStatus === 'CANCELLED',
             }"
           >
             {{
               ticket.ticketStatus === "PAID"
                 ? "Đã Thanh Toán"
+                : ticket.ticketStatus === "CANCELLED"
+                ? "Đã Hủy"
                 : "Chưa Thanh Toán"
             }}
           </span>
         </div>
         <div class="ticket-detail">
           <div>
-          <p class="text-gray-700 text-lg font-medium">
-            Mã Vé:
-            <span class="font-bold text-blue-600">#{{ ticket.ticketId }}</span>
-          </p>
-          <p class="text-gray-700 text-lg font-medium">
-            Giá:
-            <span class="font-bold"
-              >{{ ticket.ticketPrice.toLocaleString() }} VND</span
-            >
-          </p>
-          <p class="text-gray-700 text-lg font-medium">
-            Vị trí: <span class="font-bold">{{ ticket.ticketPosition }}</span>
-          </p>
-          <p class="text-gray-700 text-lg font-medium">
-            Loại vé: <span class="font-bold">{{ ticket.ticketDuration }}</span>
-          </p>
-          <p class="text-gray-700 text-lg font-medium">
-            Ngày hiệu lực:
-            <span class="font-bold">{{
-              formatDate(ticket.ticketDayActive)
-            }}</span>
-          </p>
-          <p class="text-gray-700 text-lg font-medium">
-            Thời gian đặt:
-            <span class="font-bold">{{
-              formatDate(ticket.ticketBookingTime)
-            }}</span>
-          </p>
+            <p class="text-gray-700 text-lg font-medium">
+              Mã Vé:
+              <span class="font-bold text-blue-600"
+                >#{{ ticket.ticketId }}</span
+              >
+            </p>
+            <p class="text-gray-700 text-lg font-medium">
+              Giá:
+              <span class="font-bold"
+                >{{ ticket.ticketPrice.toLocaleString() }} VND</span
+              >
+            </p>
+            <p class="text-gray-700 text-lg font-medium">
+              Vị trí: <span class="font-bold">{{ ticket.ticketPosition }}</span>
+            </p>
+            <p class="text-gray-700 text-lg font-medium">
+              Loại vé:
+              <span class="font-bold">{{ ticket.ticketDuration }}</span>
+            </p>
+            <p class="text-gray-700 text-lg font-medium">
+              Ngày hiệu lực:
+              <span class="font-bold">{{
+                formatDate(ticket.ticketDayActive)
+              }}</span>
+            </p>
+            <p class="text-gray-700 text-lg font-medium">
+              Thời gian đặt:
+              <span class="font-bold">{{
+                formatDate(ticket.ticketBookingTime)
+              }}</span>
+            </p>
+          </div>
+          <div class="mt-4 flex justify-center">
+            <img
+              v-if="ticket.qrCodeBase64"
+              :src="ticket.qrCodeBase64"
+              alt="QR Code"
+              class="w-32 h-32"
+            />
+            <p v-else class="text-gray-500">Không có QR Code</p>
+          </div>
         </div>
-        <div class="mt-4 flex justify-center">
-          <img
-            v-if="ticket.qrCodeBase64"
-            :src="ticket.qrCodeBase64"
-            alt="QR Code"
-            class="w-32 h-32"
-          />
-          <p v-else class="text-gray-500">Không có QR Code</p>
-        </div>
-
-        </div>
-        
-
-        
 
         <div
           v-if="ticket.ticketStatus === 'UNPAID'"
@@ -124,10 +127,11 @@
 </template>
 
 <style scoped>
-.ticket-detail{
+.ticket-detail {
   display: flex;
   justify-content: space-between;
-}</style>
+}
+</style>
 <script>
 import { api } from "@/api/Api";
 import format from "date-fns/format";
@@ -182,10 +186,12 @@ export default {
     },
     async cancelTicket(ticketId) {
       try {
-        await api.delete(`/tickets/${ticketId}`);
-        this.$toast.success("Hủy vé thành công.");
-        this.tickets = this.tickets.filter(
-          (ticket) => ticket.ticketId !== ticketId
+        const res = await api.patch(`/tickets/${ticketId}`);
+        this.$toast.success("Đã gửi yêu càu vé.");
+        const updatedTicket = res.data.data;
+        // Cập nhật vé trong danh sách thay vì xóa nhầm
+        this.tickets = this.tickets.map((ticket) =>
+          ticket.ticketId === ticketId ? updatedTicket : ticket
         );
       } catch (error) {
         this.$toast.error(error.response?.data?.message || "Đã xảy ra lỗi");
