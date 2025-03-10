@@ -7,24 +7,29 @@
         to="/"
         style="color: black; font-size: 35px"
       >
-      EventHub 
+        EventHub
       </router-link>
 
       <!-- Search Bar -->
       <div class="relative w-1/3">
         <input
+          v-model="searchText"
+          @keyup.enter="goToSearch"
           type="text"
           name="textSearch"
-          placeholder="Search"
-          class="w-full p-2 pl-4 pr-10 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Tìm kiếm sự kiện theo tiêu đề..."
+          class="w-full p-2 pl-4 pr-10 border border-gray-600 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <i
-          class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-gray-400"
-        ></i>
+        <button
+          @click="goToSearch"
+          class="absolute right-3 top-2.5 text-gray-400"
+        >
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
       </div>
       <!-- Thanh menu hiển thị trên PC -->
       <ul class="hidden md:flex items-center space-x-4">
-        <li >
+        <li>
           <router-link class="hover:text-blue-400" to="/events">
             Trang sự kiện
           </router-link>
@@ -126,6 +131,7 @@
 <script>
 import { useAuthStore } from "../stores/pina";
 import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   name: "Header",
@@ -135,6 +141,8 @@ export default {
     const isAuthenticated = computed(() => authStore.isAuthenticated);
     const isAdmin = computed(() => authStore.isAdmin);
 
+    const searchText = ref("");
+    const router = useRouter();
     const isMenuOpen = ref(false);
 
     const toggleMenu = () => {
@@ -150,12 +158,20 @@ export default {
       }
     };
 
+    const goToSearch = () => {
+      if (searchText.value.trim()) {
+        router.push({ path: "/events/search", query: { keyword: searchText.value } });
+      }
+    };
+
     return {
       isAuthenticated,
       isAdmin,
       isMenuOpen,
       toggleMenu,
       logout,
+      goToSearch,
+      searchText,
     };
   },
 };

@@ -1,8 +1,9 @@
 <template>
-  <div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+  <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
       Vé Điện Tử Của Bạn
     </h2>
+  <div class=" p-6 bg-white shadow-lg rounded-lg ">
+    
 
     <div v-if="loading" class="text-center text-gray-600">
       Đang tải dữ liệu...
@@ -12,7 +13,7 @@
       Bạn chưa có vé nào.
     </div>
 
-    <div v-else class="space-y-6">
+    <div v-else class="space-y-6 grid grid-cols-2 gap-4">
       <div
         v-for="ticket in tickets"
         :key="ticket.ticketId"
@@ -138,6 +139,9 @@ import format from "date-fns/format";
 import differenceInDays from "date-fns/differenceInDays";
 
 export default {
+  props: {
+    userInfo: Object,
+  },
   data() {
     return {
       userId: "",
@@ -149,6 +153,8 @@ export default {
       totalPages: 1, // Cho phép chọn số lượng vé mỗi trang
     };
   },
+  watch: {
+  },
   methods: {
     async fetchTickets() {
       this.loading = true;
@@ -159,7 +165,6 @@ export default {
             this.page - 1
           }&size=${this.size}`
         );
-        console.log(response.data.data.content);
         // Chuyển đổi QR Code byte[] thành Base64 ngay từ response
         this.tickets = response.data.data.content.map((ticket) => {
           if (ticket.qrCode) {

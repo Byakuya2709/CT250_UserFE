@@ -30,6 +30,12 @@ const router = createRouter({
       meta: { requiresAuth: false },
     },
     {
+      path: "/events/search",
+      name: "SearchResults",
+      component: () => import("../views/EventView/SearchView.vue"),
+      meta: { requiresAuth: false },
+    },
+    {
       path: "/events/:eventId",
       name: "EventDetail",
       component: () => import("../views/EventView/EventDetail.vue"),

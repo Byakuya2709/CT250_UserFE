@@ -49,25 +49,25 @@
           <h3
             class="card-title text-center text-uppercase fw-bold text-primary mb-4"
           >
-            <i class="fas fa-calendar-alt"></i> Event Details
+            <i class="fas fa-calendar-alt"></i> Thông tin sự kiện
           </h3>
           <ul class="list-group list-group-flush">
             <li class="list-group-item d-flex justify-content-between">
               <strong
-                ><i class="fas fa-clock text-warning"></i> Start Date:</strong
+                ><i class="fas fa-clock text-warning"></i> Ngày bắt đầu:</strong
               >
               <span>{{ formattedStartDate }}</span>
             </li>
             <li class="list-group-item d-flex justify-content-between">
               <strong
-                ><i class="fas fa-clock text-danger"></i> End Date:</strong
+                ><i class="fas fa-clock text-danger"></i> Ngày kết thúc:</strong
               >
               <span>{{ formattedEndDate }}</span>
             </li>
             <li class="list-group-item d-flex justify-content-between">
               <strong
-                ><i class="fas fa-money-bill-wave text-success"></i>
-                Price:</strong
+                ><i class="fas fa-money-bill-wave text-success"></i> Giá
+                vé:</strong
               >
               <span class="fw-semibold text-success"
                 >{{ event.eventPrice }} VND</span
@@ -75,33 +75,44 @@
             </li>
             <li class="list-group-item d-flex justify-content-between">
               <strong
-                ><i class="fas fa-map-marker-alt text-info"></i>
-                Location:</strong
+                ><i class="fas fa-map-marker-alt text-info"></i> Địa chỉ tổ
+                chức:</strong
               >
               <span>{{ event.eventAddress }}</span>
             </li>
             <li class="list-group-item d-flex justify-content-between">
               <strong
-                ><i class="fas fa-users text-primary"></i> Capacity:</strong
+                ><i class="fas fa-users text-primary"></i> Số lượng:</strong
               >
               <span class="fw-semibold text-primary"
-                >{{ event.eventCapacity }} people</span
+                >{{ event.eventCapacity }} người</span
               >
             </li>
             <li class="list-group-item d-flex justify-content-between">
               <strong
-                ><i class="fas fa-check-circle text-secondary"></i>
-                Status:</strong
+                ><i class="fas fa-check-circle text-secondary"></i> Trạng
+                thái:</strong
               >
               <span class="fw-bold">{{ event.eventStatus }}</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between"
+              v-if="event.eventListArtist && event.eventListArtist.length"
+            >
+              <strong
+                ><i class="fas fa-music text-purple"></i> Nghệ sĩ tham
+                gia:</strong
+              >
+              <span class="fw-semibold text-primary">{{ event.eventListArtist.join(", ") }}</span>
             </li>
           </ul>
         </div>
       </div>
     </div>
-
     <div class="event-descriptions">
-      <h3>Mô tả sự kiện</h3>
+      <h2 class="text-3xl font-bold text-white mb-6 text-center">
+    Mô Tả Sự Kiện 
+    </h2>
       <p class="event-description">
         {{ isExpanded ? event.eventDescription : truncatedText }}
       </p>
@@ -115,7 +126,9 @@
     </div>
 
     <div class="event-tickets">
-      <h3>Book Your Tickets</h3>
+      <h2 class="text-3xl font-bold text-white-800 mb-6 text-center">
+        Đặt Vé Tại Đây
+      </h2>
       <div class="ticket-list">
         <div
           v-for="(remainingCapacity, day) in event.eventTicketCapacity"
@@ -125,7 +138,7 @@
           <p>
             <strong>Day {{ day }}</strong>
           </p>
-          <p>Remaining Tickets: {{ remainingCapacity }}</p>
+          <p>Số lượng còn lại: {{ remainingCapacity }}</p>
           <button
             class="book-btn"
             :disabled="!canPurchaseTicket"
@@ -212,12 +225,13 @@
 
         <!-- Cảm xúc -->
         <div class="flex items-center gap-4 mt-2 text-gray-500">
-          <button
+          <!-- <button
             @click="likeBlog(blog.blogId)"
+            disabled
             class="flex items-center gap-2 text-gray-500 hover:text-red-500 transition"
           >
             ❤️ {{ blog.blogEmotionsNumber }}
-          </button>
+          </button> -->
           <button
             @click="goBlogDetail(blog.blogId)"
             class="flex items-center gap-1 hover:text-blue-500"
@@ -331,11 +345,8 @@ export default {
         params.month = null;
         params.year = null;
 
-        console.log(params);
         params.page = page;
         params.size = 3;
-
-        console.log("Params gửi API:", params);
 
         const response = await api.get("/blogs/filter", { params });
         this.blogs = response.data.data.content;
@@ -352,6 +363,7 @@ export default {
       try {
         const response = await api.get(`/public/${this.eventId}`);
         this.event = response.data.data;
+        console.log(this.event);
       } catch (error) {
         console.error("Error fetching event data:", error);
         this.$toast.error(error.response?.data?.message || "Đã xảy ra lỗi");

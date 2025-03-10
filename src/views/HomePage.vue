@@ -39,8 +39,18 @@ export default {
     eventTags() {
       return eventTags; // Sử dụng dữ liệu từ module
     },
+    invalidFilter() {
+      if (!this.filters.month && !this.filters.year) {
+        return false; // Cho phép không chọn tháng và năm
+      }
+      return (
+        (this.filters.month && !this.filters.year) ||
+        (this.filters.year && !this.filters.month)
+      );
+    },
   },
   methods: {
+    
     formatCurrency,
     async fetchEventsByTag(selectedTag) {
       if (!selectedTag) return;
@@ -105,6 +115,10 @@ export default {
       }
     },
     applyFilters() {
+      if (this.invalidFilter) {
+        console.warn("Lỗi: Nếu chọn tháng thì phải chọn năm và ngược lại!");
+        return;
+      }
       this.currentPage = 1; // Reset to first page when filters are applied
       this.getEvents();
     },
@@ -190,7 +204,7 @@ export default {
         class="text-4xl font-bold text-gray-800 p-4 text-center"
         style="background: #f3e8ff"
       >
-        Tất Cả Sự Kiện
+        Sự kiện nổi bật
       </h2>
 
       <div v-if="loading" class="d-flex justify-content-center">
@@ -328,11 +342,14 @@ export default {
             {{ year }}
           </option>
         </select>
-
+        <p v-if="invalidFilter" class="text-red-500 mb-2">
+      Nếu chọn tháng thì phải chọn năm và ngược lại!
+    </p>
         <div class="flex space-x-2 mt-4">
           <button
             @click="applyFilters"
             class="bg-blue-500 text-white px-4 py-2 rounded"
+              :disabled="invalidFilter"
           >
             Áp dụng
           </button>
@@ -432,7 +449,7 @@ export default {
 
     <!-- Danh sách sự kiện bên phải -->
     <div class="w-3/4 p-4">
-      <div
+      <div v-if="eventsByTag"
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
       >
         <div
@@ -465,6 +482,7 @@ export default {
           />
         </div>
       </div>
+      <div v-else class=" font-bold text-lg">Không có sự kiện nào</div>
     </div>
   </div>
 </template>
