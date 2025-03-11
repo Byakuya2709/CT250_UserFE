@@ -62,7 +62,7 @@
       </ul>
 
       <!-- Nút menu cho Mobile -->
-      <button class="md:hidden text-white text-2xl" @click="toggleMenu">
+      <button class="md:hidden text-black text-2xl" @click="toggleMenu">
         <i :class="isMenuOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'"></i>
       </button>
     </nav>
@@ -112,16 +112,23 @@
             >
           </li>
         </ul>
-        <ul class="mt-3">
-          <input
-            type="text"
-            name="textSearch"
-            placeholder="Search"
-            class="w-full p-2 pl-4 pr-10 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <i
-            class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-gray-400"
-          ></i>
+        <ul class="mt-3 flex items-center space-x-2">
+          <div class="relative flex-1">
+            <input
+              v-model="searchText"
+              @keyup.enter="goToSearch"
+              type="text"
+              name="textSearch"
+              placeholder="Tìm kiếm sự kiện theo tiêu đề..."
+              class="w-full p-2 pl-4 pr-10 border border-gray-600 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            @click="goToSearch"
+            class="bg-white text-black py-2 rounded-md"
+          >
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
         </ul>
       </div>
     </transition>
@@ -160,7 +167,10 @@ export default {
 
     const goToSearch = () => {
       if (searchText.value.trim()) {
-        router.push({ path: "/events/search", query: { keyword: searchText.value } });
+        router.push({
+          path: "/events/search",
+          query: { keyword: searchText.value },
+        });
       }
     };
 

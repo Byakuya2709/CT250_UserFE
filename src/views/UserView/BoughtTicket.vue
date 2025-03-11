@@ -3,12 +3,10 @@
     Vé Điện Tử Của Bạn
   </h2>
   <div class="p-6 bg-white shadow-lg rounded-lg">
-    <div v-if="loading" class="text-center text-gray-600">
-      Đang tải dữ liệu...
-    </div>
-    <div v-else-if="error" class="text-red-500 text-center">{{ error }}</div>
-    <div v-else-if="tickets.length === 0" class="text-center text-gray-500">
-      Bạn chưa có vé nào.
+    <loading :active="loading" />
+
+    <div v-if="tickets.length === 0" class="text-center text-gray-500">
+      Bạn chưa mua vé nào.
     </div>
 
     <div v-else class="space-y-6 grid grid-cols-2 gap-4">
@@ -18,9 +16,18 @@
         class="p-6 border rounded-lg shadow-md bg-gray-50 relative overflow-hidden"
       >
         <div class="flex justify-between items-center border-b pb-4 mb-4">
-          <h3 class="text-2xl font-semibold text-gray-800">
-            {{ ticket.eventTitle }}
-          </h3>
+          <div>
+            <h3 class="text-2xl font-semibold text-gray-800">
+              {{ ticket.eventTitle }}
+            </h3>
+            <p class="text-gray-600 text-sm mt-2">
+              Ngày đặt:
+              <span class="font-semibold">{{
+                formatDate(ticket.ticketBookingTime)
+              }}</span>
+            </p>
+          </div>
+
           <span
             class="px-3 py-1 text-sm font-medium rounded-lg"
             :class="{
@@ -90,6 +97,20 @@
           </div>
         </div>
 
+        <div class="text-center mt-4 text-gray-700">
+          <p class="font-medium">
+            Trạng thái đánh giá:
+            <span
+              :class="{
+                'text-green-600': ticket.isRating,
+                'text-red-600': !ticket.isRating,
+              }"
+            >
+              {{ ticket.isRating ? "Đã đánh giá" : "Chưa đánh giá" }}
+            </span>
+          </p>
+        </div>
+
         <div
           v-if="ticket.ticketStatus === 'UNPAID'"
           class="mt-6 flex gap-3 justify-center"
@@ -108,8 +129,58 @@
             Thanh toán ngay
           </button>
         </div>
+        <div
+          v-if="
+            ticket.ticketStatus === 'PAID' &&
+            new Date(ticket.ticketExpiredTime) <= new Date() &&
+            ticket.isRating == false
+          "
+          class="mt-4 flex justify-center"
+        >
+          <button
+            @click="openReviewModal(ticket)"
+            class="px-4 py-2 bg-yellow-500 text-white rounded-lg"
+          >
+            Đánh giá sự kiện
+          </button>
+        </div>
       </div>
     </div>
+
+    <template v-if="showReviewModal">
+      <div
+        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+      >
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+          <h2 class="text-xl font-bold mb-4">Đánh giá sự kiện</h2>
+          <textarea
+            v-model="reviewData.fbContent"
+            class="w-full p-2 border rounded-lg"
+            placeholder="Nhập nội dung đánh giá..."
+          ></textarea>
+          <div class="flex items-center mt-4">
+            <span class="mr-2">Chấm điểm:</span>
+            <select v-model="reviewData.fbRate" class="border p-2 rounded-lg">
+              <option v-for="i in 5" :key="i" :value="i">{{ i }}⭐</option>
+            </select>
+          </div>
+          <div class="flex justify-end gap-2 mt-4">
+            <button
+              @click="closeReviewModal"
+              class="px-4 py-2 bg-gray-300 rounded-lg"
+            >
+              Hủy
+            </button>
+            <button
+              @click="submitReview"
+              class="px-4 py-2 bg-blue-500 text-white rounded-lg"
+            >
+              Gửi đánh giá
+            </button>
+          </div>
+        </div>
+      </div>
+    </template>
 
     <!-- Điều khiển phân trang -->
     <div class="flex justify-between items-center mt-6">
@@ -143,16 +214,28 @@
 import { api } from "@/api/Api";
 import format from "date-fns/format";
 import differenceInDays from "date-fns/differenceInDays";
-
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
 export default {
+  components: { Loading },
   props: {
     userInfo: Object,
   },
   data() {
     return {
+      reviewData: {
+        ticketId: null,
+        eventId: null,
+        fbUserId: this.userInfo.id || this.$route.params.userId, // Giả sử userInfo.id đã có trong state
+        fbContent: "",
+        fbCreateDate: "",
+        fbRate: 5,
+      },
+      showReviewModal: false,
+
       userId: "",
       tickets: [],
-      loading: true,
+      loading: false,
       error: null,
       page: 1,
       size: 10,
@@ -161,6 +244,49 @@ export default {
   },
   watch: {},
   methods: {
+    openReviewModal(ticket) {
+      this.reviewData.ticketId = ticket.ticketId;
+      this.reviewData.eventId = ticket.eventId;
+      this.reviewData.fbContent = "";
+      this.fbCreateDate = new Date().toISOString();
+      this.showReviewModal = true;
+    },
+    closeReviewModal() {
+      this.reviewData.ticketId = null;
+      this.reviewData.eventId = null;
+      (this.reviewData.fbContent = ""),
+        (this.fbCreateDate = null),
+        (this.showReviewModal = false);
+    },
+    async submitReview() {
+      this.loading = true;
+      try {
+        const res = (await api.post("/blogs/feedback", this.reviewData)).data
+          .data;
+
+        const ratingData = {
+          eventId: res.eventId,
+          userId: res.fbUserId,
+          star: res.fbRate,
+        };
+
+        const ticketId = res.ticketId;
+        const response = await api.patch(`/tickets/${ticketId}`, ratingData);
+        const updatedTicket = response.data.data;
+
+        // Cập nhật lại danh sách vé
+        this.tickets = this.tickets.map((ticket) =>
+          ticket.ticketId === updatedTicket.ticketId ? updatedTicket : ticket
+        );
+
+        this.$toast.success(response.data.message);
+        this.closeReviewModal(); // Đóng modal sau khi gửi đánh giá
+      } catch (error) {
+        this.$toast.error(error.response?.data?.message || "Đã xảy ra lỗi");
+      } finally {
+        this.loading = false;
+      }
+    },
     async fetchTickets() {
       this.loading = true;
       this.error = null;
@@ -181,7 +307,7 @@ export default {
 
           return ticket;
         });
-        console.log(this.tickets);
+
         this.totalPages = response.data.data.totalPages;
       } catch (err) {
         this.error = "Lỗi khi lấy dữ liệu vé!";
