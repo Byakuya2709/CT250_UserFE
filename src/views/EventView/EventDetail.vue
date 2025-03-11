@@ -103,7 +103,9 @@
                 ><i class="fas fa-music text-purple"></i> Nghệ sĩ tham
                 gia:</strong
               >
-              <span class="fw-semibold text-primary">{{ event.eventListArtist.join(", ") }}</span>
+              <span class="fw-semibold text-primary">{{
+                event.eventListArtist.join(", ")
+              }}</span>
             </li>
           </ul>
         </div>
@@ -111,8 +113,8 @@
     </div>
     <div class="event-descriptions">
       <h2 class="text-3xl font-bold text-white mb-6 text-center">
-    Mô Tả Sự Kiện 
-    </h2>
+        Mô Tả Sự Kiện
+      </h2>
       <p class="event-description">
         {{ isExpanded ? event.eventDescription : truncatedText }}
       </p>
@@ -209,7 +211,7 @@
             {{ new Date(blog.blogCreateDate).toLocaleDateString() }}
           </p>
         </div>
-        <p class="text-gray-700 mt-1">{{ blog.blogContent }}</p>
+        <p class="text-gray-700 mt-1 truncate">{{ blog.blogContent }}</p>
 
         <!-- Hình ảnh nếu có -->
         <div

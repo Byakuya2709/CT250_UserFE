@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { api} from "@/api/Api";
+import { api } from "@/api/Api";
 import { jwtDecode } from "jwt-decode";
 import { useToast } from "vue-toastification";
 import router from "@/router";
@@ -23,7 +23,7 @@ export const useAuthStore = defineStore("auth", {
       const token = cookies.get("token");
       if (token) {
         this.token = token;
-   
+
         const decodedToken = jwtDecode(token);
         this.$patch({
           user: { id: decodedToken.userId, email: decodedToken.sub },
@@ -31,7 +31,7 @@ export const useAuthStore = defineStore("auth", {
         });
       }
     },
-    async login(user,rolelogin) {
+    async login(user, rolelogin) {
       try {
         const response = await api.post(`/auth/${rolelogin}/login`, user);
         const res = response.data;
@@ -49,8 +49,8 @@ export const useAuthStore = defineStore("auth", {
         const expiresInSeconds = decodedToken.exp - Math.floor(Date.now() / 1000);
         cookies.set("token", this.token, expiresInSeconds + "s");
 
-        cookies.set('email',decodedToken.sub,expiresInSeconds + "s")
-        
+        cookies.set('email', decodedToken.sub, expiresInSeconds + "s")
+
         sessionStorage.setItem('UserEmail', decodedToken.sub);
         return { loginResponse: response, role: this.role };
       } catch (err) {

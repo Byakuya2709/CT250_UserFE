@@ -1,10 +1,8 @@
 <template>
   <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
-      Vé Điện Tử Của Bạn
-    </h2>
-  <div class=" p-6 bg-white shadow-lg rounded-lg ">
-    
-
+    Vé Điện Tử Của Bạn
+  </h2>
+  <div class="p-6 bg-white shadow-lg rounded-lg">
     <div v-if="loading" class="text-center text-gray-600">
       Đang tải dữ liệu...
     </div>
@@ -20,7 +18,9 @@
         class="p-6 border rounded-lg shadow-md bg-gray-50 relative overflow-hidden"
       >
         <div class="flex justify-between items-center border-b pb-4 mb-4">
-          <h3 class="text-2xl font-semibold text-gray-800">VÉ ĐIỆN TỬ</h3>
+          <h3 class="text-2xl font-semibold text-gray-800">
+            {{ ticket.eventTitle }}
+          </h3>
           <span
             class="px-3 py-1 text-sm font-medium rounded-lg"
             :class="{
@@ -61,15 +61,21 @@
               <span class="font-bold">{{ ticket.ticketDuration }}</span>
             </p>
             <p class="text-gray-700 text-lg font-medium">
-              Ngày hiệu lực:
+              Thời gian đặt:
+              <span class="font-bold">{{
+                formatDate(ticket.ticketBookingTime)
+              }}</span>
+            </p>
+            <p class="text-gray-700 text-lg font-medium">
+              Ngày có hiệu lực:
               <span class="font-bold">{{
                 formatDate(ticket.ticketDayActive)
               }}</span>
             </p>
             <p class="text-gray-700 text-lg font-medium">
-              Thời gian đặt:
+              Ngày hết hiệu lực:
               <span class="font-bold">{{
-                formatDate(ticket.ticketBookingTime)
+                formatDate(ticket.ticketExpiredTime)
               }}</span>
             </p>
           </div>
@@ -153,8 +159,7 @@ export default {
       totalPages: 1, // Cho phép chọn số lượng vé mỗi trang
     };
   },
-  watch: {
-  },
+  watch: {},
   methods: {
     async fetchTickets() {
       this.loading = true;
@@ -165,6 +170,7 @@ export default {
             this.page - 1
           }&size=${this.size}`
         );
+
         // Chuyển đổi QR Code byte[] thành Base64 ngay từ response
         this.tickets = response.data.data.content.map((ticket) => {
           if (ticket.qrCode) {
@@ -172,9 +178,10 @@ export default {
           } else {
             ticket.qrCodeBase64 = null;
           }
+
           return ticket;
         });
-
+        console.log(this.tickets);
         this.totalPages = response.data.data.totalPages;
       } catch (err) {
         this.error = "Lỗi khi lấy dữ liệu vé!";
@@ -239,8 +246,11 @@ export default {
       }
     },
     nextPage() {
-      this.page++;
-      this.fetchTickets();
+      if (this.page === this.totalPages) return; // Fixed the comparison here
+      else {
+        this.page++;
+        this.fetchTickets();
+      }
     },
   },
   mounted() {

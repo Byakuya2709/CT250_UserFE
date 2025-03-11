@@ -4,7 +4,8 @@
     <section class="text-center py-16">
       <h1 class="text-4xl font-bold">Chào mừng đến với EventHub</h1>
       <p class="mt-4">
-        Nền tảng đặt vé sự kiện hàng đầu giúp bạn trải nghiệm những khoảnh khắc tuyệt vời nhất!
+        Nền tảng đặt vé sự kiện hàng đầu giúp bạn trải nghiệm những khoảnh khắc
+        tuyệt vời nhất!
       </p>
       <div class="mt-6">
         <router-link to="/events" class="bg-pink-600 px-6 py-3 rounded-full">
@@ -24,7 +25,7 @@
           :class="{
             'grid-cols-3': eventInCurrentMonth.length >= 3,
             'grid-cols-2': eventInCurrentMonth.length === 2,
-            'grid-cols-1': eventInCurrentMonth.length === 1
+            'grid-cols-1': eventInCurrentMonth.length === 1,
           }"
         >
           <div
@@ -34,7 +35,10 @@
             class="group relative bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-blue-500"
           >
             <img
-              :src="event.eventImageURL ?? 'https://res.cloudinary.com/dtza0pk4w/image/upload/v1736700339/mbs_ortxmh.jpg'"
+              :src="
+                event.eventImageURL ??
+                'https://res.cloudinary.com/dtza0pk4w/image/upload/v1736700339/mbs_ortxmh.jpg'
+              "
               class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
               alt="Event Image"
             />
@@ -87,19 +91,30 @@
             'grid-cols-4': blogs.length === 4,
             'grid-cols-3': blogs.length === 3,
             'grid-cols-2': blogs.length === 2,
-            'grid-cols-1': blogs.length === 1
+            'grid-cols-1': blogs.length === 1,
           }"
         >
-          <div v-for="blog in blogs" :key="blog.blogId" class="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-105 hover:shadow-2xl hover:border-blue-500">
+          <div
+            v-for="blog in blogs"
+            :key="blog.blogId"
+            class="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-105 hover:shadow-2xl hover:border-blue-500"
+            @click="goBlogDetail(blog)"
+          >
             <img
               :src="blog.eventListImgURL[0]"
               alt="Blog image"
               class="w-full h-48 object-cover"
             />
             <div class="p-4">
-              <h3 class="text-lg font-semibold text-gray-800">{{ blog.blogSubject }}</h3>
-              <p class="text-gray-600 text-sm mt-2">{{ blog.blogContent }}</p>
-              <div class="text-gray-500 text-xs mt-3">{{ new Date(blog.blogCreateDate).toLocaleDateString() }}</div>
+              <h3 class="text-lg font-semibold text-gray-800">
+                {{ blog.blogSubject }}
+              </h3>
+              <p class="text-gray-600 text-sm mt-2 truncate">
+                {{ blog.blogContent }}
+              </p>
+              <div class="text-gray-500 text-xs mt-3">
+                {{ new Date(blog.blogCreateDate).toLocaleDateString() }}
+              </div>
             </div>
           </div>
         </div>
@@ -121,6 +136,9 @@ export default {
     };
   },
   methods: {
+    goBlogDetail(blog) {
+      this.$router.push(`/events/${blog.eventId}/blogs/${blog.blogId}`);
+    },
     async fetchCurrentMonthEvents() {
       try {
         const response = await api.get("/public/current-month");
