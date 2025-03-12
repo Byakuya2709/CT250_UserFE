@@ -23,6 +23,7 @@ const router = createRouter({
       meta: { requiresAuth: false },
     },
 
+
     {
       path: "/events",
       name: "ViewEvents",
@@ -94,6 +95,12 @@ const router = createRouter({
 
       children: [
         {
+          path: "",
+          name: "EventCalendar",
+          component: () => import("../views/Calender.vue"),
+          props: (route) => ({ userInfo: route.meta.userInfo }),
+        },
+        {
           path: ":userId/profile",
           name: "UserProfile",
           component: () => import("../views/UserView/UserProfile.vue"),
@@ -103,6 +110,11 @@ const router = createRouter({
           path: ":userId/tickets",
           name: "PurchasedTickets",
           component: () => import("../views/UserView/BoughtTicket.vue"),
+        },
+        {
+          path: ":userId/feedbacks",
+          name: "Feedback",
+          component: () => import("../views/UserView/Review.vue"),
         },
       ],
     },

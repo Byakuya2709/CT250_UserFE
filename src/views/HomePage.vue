@@ -50,7 +50,6 @@ export default {
     },
   },
   methods: {
-    
     formatCurrency,
     async fetchEventsByTag(selectedTag) {
       if (!selectedTag) return;
@@ -343,13 +342,13 @@ export default {
           </option>
         </select>
         <p v-if="invalidFilter" class="text-red-500 mb-2">
-      Nếu chọn tháng thì phải chọn năm và ngược lại!
-    </p>
+          Nếu chọn tháng thì phải chọn năm và ngược lại!
+        </p>
         <div class="flex space-x-2 mt-4">
           <button
             @click="applyFilters"
             class="bg-blue-500 text-white px-4 py-2 rounded"
-              :disabled="invalidFilter"
+            :disabled="invalidFilter"
           >
             Áp dụng
           </button>
@@ -366,7 +365,7 @@ export default {
     <!-- Danh sách sự kiện bên phải -->
     <div class="w-3/4 p-4">
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6"
       >
         <div
           v-for="event in paginatedAccounts"
@@ -449,8 +448,9 @@ export default {
 
     <!-- Danh sách sự kiện bên phải -->
     <div class="w-3/4 p-4">
-      <div v-if="eventsByTag"
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+      <div
+        v-if="eventsByTag"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6"
       >
         <div
           v-for="event in eventsByTag"
@@ -482,7 +482,7 @@ export default {
           />
         </div>
       </div>
-      <div v-else class=" font-bold text-lg">Không có sự kiện nào</div>
+      <div v-else class="font-bold text-lg">Không có sự kiện nào</div>
     </div>
   </div>
 </template>

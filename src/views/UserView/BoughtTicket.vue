@@ -9,13 +9,15 @@
       Bạn chưa mua vé nào.
     </div>
 
-    <div v-else class="space-y-6 grid grid-cols-2 gap-4">
+    <div v-else class="space-y-6 grid grid-cols-1 md:grid-cols-2 gap-4">
       <div
         v-for="ticket in tickets"
         :key="ticket.ticketId"
         class="p-6 border rounded-lg shadow-md bg-gray-50 relative overflow-hidden"
       >
-        <div class="flex justify-between items-center border-b pb-4 mb-4">
+        <div
+          class="flex flex-col md:flex-row justify-between items-center border-b pb-4 mb-4"
+        >
           <div>
             <h3 class="text-2xl font-semibold text-gray-800">
               {{ ticket.eventTitle }}
@@ -29,7 +31,7 @@
           </div>
 
           <span
-            class="px-3 py-1 text-sm font-medium rounded-lg"
+            class="px-3 py-1 text-sm font-medium rounded-lg mt-2 md:mt-0"
             :class="{
               'bg-green-100 text-green-700': ticket.ticketStatus === 'PAID',
               'bg-red-100 text-red-700': ticket.ticketStatus === 'UNPAID',
@@ -46,8 +48,8 @@
             }}
           </span>
         </div>
-        <div class="ticket-detail">
-          <div>
+        <div class="ticket-detail flex flex-col md:flex-row">
+          <div class="flex-1">
             <p class="text-gray-700 text-lg font-medium">
               Mã Vé:
               <span class="font-bold text-blue-600"
@@ -86,7 +88,7 @@
               }}</span>
             </p>
           </div>
-          <div class="mt-4 flex justify-center">
+          <div class="mt-4 flex justify-center md:justify-end">
             <img
               v-if="ticket.qrCodeBase64"
               :src="ticket.qrCodeBase64"
@@ -151,8 +153,12 @@
       <div
         class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
       >
-        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-          <h2 class="text-xl font-bold mb-4">Đánh giá sự kiện</h2>
+        <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-96">
+          <h2 class="text-xl font-bold mb-2">Đánh giá sự kiện</h2>
+          <p class="text-sm text-red-500 mb-4">
+            *Bạn chỉ được đánh giá một lần và không thể chỉnh sửa hoặc xóa.
+          </p>
+
           <textarea
             v-model="reviewData.fbContent"
             class="w-full p-2 border rounded-lg"
@@ -207,7 +213,13 @@
 <style scoped>
 .ticket-detail {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
+}
+@media (min-width: 768px) {
+  .ticket-detail {
+    flex-direction: row;
+  }
 }
 </style>
 <script>

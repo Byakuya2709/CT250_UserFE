@@ -227,13 +227,6 @@
 
         <!-- Cảm xúc -->
         <div class="flex items-center gap-4 mt-2 text-gray-500">
-          <!-- <button
-            @click="likeBlog(blog.blogId)"
-            disabled
-            class="flex items-center gap-2 text-gray-500 hover:text-red-500 transition"
-          >
-            ❤️ {{ blog.blogEmotionsNumber }}
-          </button> -->
           <button
             @click="goBlogDetail(blog.blogId)"
             class="flex items-center gap-1 hover:text-blue-500"
@@ -266,6 +259,82 @@
       </button>
     </div>
   </div>
+
+  <!-- Feedback Section -->
+  <div class="container mt-7 border border-black p-4 rounded-lg">
+    <h4
+      class="mb-4 text-2xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl"
+    >
+      Phần đánh giá
+    </h4>
+
+    <loading :active="loadingFeedbacks" />
+    <div
+      v-if="feedbacks.length === 0 && !loadingFeedbacks"
+      class="text-center text-gray-500"
+    >
+      Chưa có đánh giá nào.
+    </div>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div
+        v-for="feedback in feedbacks"
+        :key="feedback.fbId"
+        class="p-6 border rounded-lg shadow-md bg-gray-50"
+      >
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">
+          Đánh giá từ vé số: {{ feedback.ticketId }}
+        </h3>
+        <div class="flex items-center mb-2">
+          <span
+            class="text-yellow-500 mr-1"
+            v-for="i in feedback.fbRate"
+            :key="i"
+            >⭐</span
+          >
+          <span
+            class="text-gray-500"
+            v-for="i in 5 - feedback.fbRate"
+            :key="`empty-${i}`"
+            >☆</span
+          >
+        </div>
+
+        <p class="text-gray-700">
+          {{ feedback.fbContent }}
+        </p>
+        <p class="text-gray-600 text-sm mt-2">
+          Ngày đánh giá:
+          <span class="font-semibold">
+            {{ formatDate(feedback.fbCreateDate) }}
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div
+      v-if="totalFeedbackPages > 1"
+      class="flex justify-between items-center mt-6"
+    >
+      <button
+        @click="prevFeedbackPage"
+        :disabled="feedbackPage === 1"
+        class="px-4 py-2 bg-blue-500 text-gray-700 rounded-lg disabled:opacity-50"
+      >
+        Trang trước
+      </button>
+      <span class="text-gray-800 font-medium"
+        >Trang {{ feedbackPage }} / {{ totalFeedbackPages }}</span
+      >
+      <button
+        @click="nextFeedbackPage"
+        :disabled="feedbackPage === totalFeedbackPages"
+        class="px-4 py-2 bg-blue-500 text-gray-700 rounded-lg"
+      >
+        Trang sau
+      </button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -274,18 +343,28 @@ import "swiper/swiper-bundle.css";
 import { api } from "@/api/Api";
 import EventBooking from "@/views/EventView/EventBooking.vue";
 import EventBookingAllDay from "@/views/EventView/EventBookingAllDay.vue";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
+
 export default {
   components: {
     Swiper,
     SwiperSlide,
     EventBooking,
     EventBookingAllDay,
+    Loading,
   },
   data() {
     return {
       blogs: [],
       currentPage: 0,
       totalPages: 1,
+
+      feedbacks: [],
+      loadingFeedbacks: false,
+      feedbackPage: 1,
+      feedbackSize: 10,
+      totalFeedbackPages: 1,
 
       isModalOpen: false,
       loading: true,
@@ -302,6 +381,7 @@ export default {
   async mounted() {
     await this.fetchEventData();
     await this.fetchBlogs();
+    await this.fetchFeedbacks();
     if (this.$route.name === "EventBooking") {
       const dayQuery = this.$route.query.day;
       if (dayQuery) {
@@ -358,6 +438,41 @@ export default {
         this.$toast.error(err.response?.data?.message || "Lỗi khi gửi blog");
       } finally {
         this.loading = false;
+      }
+    },
+    async fetchFeedbacks(page = 1) {
+      this.loadingFeedbacks = true;
+      this.error = null;
+      try {
+        const response = await api.get(
+          `/blogs/feedbacks/event/${this.eventId}?page=${page - 1}&size=${
+            this.feedbackSize
+          }`
+        );
+        this.feedbacks = response.data.data.content;
+        this.totalFeedbackPages = response.data.data.totalPages;
+      } catch (error) {
+        this.error =
+          error.response?.data?.message || "Failed to fetch feedbacks";
+        this.$toast.error(this.error);
+      } finally {
+        this.loadingFeedbacks = false;
+      }
+    },
+    formatDate(dateString) {
+      if (!dateString) return "Chưa xác định";
+      return new Date(dateString).toLocaleDateString();
+    },
+    prevFeedbackPage() {
+      if (this.feedbackPage > 1) {
+        this.feedbackPage--;
+        this.fetchFeedbacks(this.feedbackPage);
+      }
+    },
+    nextFeedbackPage() {
+      if (this.feedbackPage < this.totalFeedbackPages) {
+        this.feedbackPage++;
+        this.fetchFeedbacks(this.feedbackPage);
       }
     },
     async fetchEventData() {
@@ -466,6 +581,8 @@ export default {
     // Cho phép mua vé nếu thời gian còn lại từ 0 đến 7 ngày trước khi sự kiện bắt đầu
     canPurchaseTicket() {
       if (!this.event || !this.event.eventStartDate) return false;
+      if (this.event.eventStatus !== "UP_COMMING") return false;
+
       const now = new Date();
       const eventDate = new Date(this.event.eventStartDate);
       const diffTime = eventDate.getTime() - now.getTime();
