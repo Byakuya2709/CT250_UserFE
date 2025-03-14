@@ -679,8 +679,7 @@ export default {
   max-width: 80%;
   margin-top: 20px;
 }
-.event-descriptions {
-}
+
 .event-description {
   font-size: 16px;
   line-height: 1.6;

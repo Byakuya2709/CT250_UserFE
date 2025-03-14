@@ -78,14 +78,25 @@ export default {
       }
     },
     onCellClick(event) {
-      // Handle cell click event, e.g., show ticket details
-      console.log("Cell clicked:", event);
+      if (event.startDate) {
+        const selectedDate = event.startDate;
+        console.log("Chuyển đến ngày:", selectedDate);
+
+        // Di chuyển đến ngày/tháng được chọn
+        this.$refs.calendar.moveToDate(selectedDate);
+      }
     },
   },
 };
 </script>
 
 <style>
+/* Đổi màu ô có sự kiện */
+.vuecal__cell--current {
+  background-color: #e5e8a8 !important;
+  border-radius: 5px;
+}
+
 .event-calendar-container {
   max-width: 1000px;
   margin: 0 auto;

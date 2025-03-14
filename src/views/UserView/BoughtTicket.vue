@@ -283,13 +283,21 @@ export default {
         };
 
         const ticketId = res.ticketId;
-        const response = await api.patch(`/tickets/${ticketId}`, ratingData);
+        const response = await api.patch(
+          `/tickets/rating/${ticketId}`,
+          ratingData
+        );
         const updatedTicket = response.data.data;
+        console.log(updatedTicket);
 
         // Cập nhật lại danh sách vé
-        this.tickets = this.tickets.map((ticket) =>
-          ticket.ticketId === updatedTicket.ticketId ? updatedTicket : ticket
-        );
+        this.tickets = this.tickets.map((ticket) => {
+          if (ticket.ticketId === updatedTicket.ticketId) {
+            console.log("Updating ticket:", ticket);
+            return updatedTicket;
+          }
+          return ticket;
+        });
 
         this.$toast.success(response.data.message);
         this.closeReviewModal(); // Đóng modal sau khi gửi đánh giá

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router"; // Dùng createWebHistory
+import { createRouter, createWebHistory, createWebHashHistory } from "vue-router"; // Dùng createWebHistory
 import HomeView from "../views/HomeView.vue";
 import { jwtDecode } from "jwt-decode";
 
@@ -7,7 +7,7 @@ import { useCookies } from "vue3-cookies";
 const { cookies } = useCookies(); // Lấy cookies API
 
 const router = createRouter({
-  history: createWebHistory(), // Cấu hình sử dụng history mode
+  history: createWebHashHistory(), // Chuyển sang hash mode
   routes: [
     // {
     //   path: "/",

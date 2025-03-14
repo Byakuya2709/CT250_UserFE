@@ -12,13 +12,16 @@
     </div>
     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div
+        @click="goToEventDetails(feedback.eventId)"
         v-for="feedback in feedbacks"
         :key="feedback.fbId"
         class="p-6 border rounded-lg shadow-md bg-gray-50"
       >
         <h3 class="text-xl font-semibold text-gray-800 mb-2">
-          Đánh giá từ vé số: {{ feedback.ticketId }}
+          Đánh giá từ sự kiện/vé: {{ feedback.eventId }} /
+          {{ feedback.ticketId }}
         </h3>
+
         <div class="flex items-center mb-2">
           <span
             class="text-yellow-500 mr-1"
@@ -43,6 +46,12 @@
             {{ formatDate(feedback.fbCreateDate) }}
           </span>
         </p>
+        <button
+          @click.stop="deleteFeedback(feedback)"
+          class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
+        >
+          Xóa
+        </button>
       </div>
     </div>
 
@@ -91,6 +100,38 @@ export default {
     };
   },
   methods: {
+    goToEventDetails(eventId) {
+      this.$router.push({ path: `/events/${eventId}` });
+    },
+    async deleteFeedback(feedback) {
+      this.loading = true;
+      try {
+        this.loading = true;
+        await api.delete(`/blogs/feedback/${feedback.fbId}`);
+        this.feedbacks = this.feedbacks.filter(
+          (fb) => fb.fbId !== feedback.fbId
+        );
+
+        const ratingData = {
+          eventId: feedback.eventId,
+          userId: feedback.fbUserId,
+          star: feedback.fbRate,
+        };
+        console.log(ratingData);
+
+        const response = await api.patch(
+          `/tickets/feedback/${feedback.ticketId}`,
+          ratingData
+        );
+
+        this.$toast.success(response.data.message);
+      } catch (error) {
+        console.log(error);
+        this.$toast.error(error.response?.data?.message || "Đã xảy ra lỗi");
+      } finally {
+        this.loading = false;
+      }
+    },
     async fetchFeedbacks() {
       this.loading = true;
       this.error = null;

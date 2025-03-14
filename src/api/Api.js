@@ -5,7 +5,8 @@ import { useAuthStore } from "@/stores/pina"; // Import store Pinia
 const toast = useToast();
 
 export const api = axios.create({
-    baseURL: 'http://localhost:8080/',
+    // baseURL: 'http://localhost:8080/',
+    baseURL: 'http://192.168.56.1:8080/',
     withCredentials: true, // 🌟 Cho phép gửi cookie
     headers: {
         "Content-Type": "application/json",
