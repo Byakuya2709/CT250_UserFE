@@ -99,7 +99,7 @@
       <!-- Bình luận -->
       <div class="mt-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-3">Bình luận</h2>
-
+       
         <!-- Phần nhập bình luận -->
         <div class="mt-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-3">
@@ -118,7 +118,7 @@
             Gửi bình luận
           </button>
         </div>
-
+        <p class="text-red-500 mt-2"> *Đăng nhập để xem rõ thông tin người bình luận </p>
         <div
           v-for="comment in comments"
           :key="comment.cmtId"
@@ -138,6 +138,12 @@
               {{
                 userCache[comment.cmtUserId]?.userName || "Người dùng ẩn danh"
               }}
+              <span
+                v-if="comment.cmtUserId === blog.blogUserId"
+                class="text-red-500"
+              >
+                (Chủ blog)
+              </span>
             </p>
 
             <!-- Nếu đang chỉnh sửa, hiển thị ô nhập -->
@@ -344,6 +350,7 @@ export default {
         if (
           !comment ||
           comment.cmtContent.trim() === this.editedContent.trim()
+          || !this.editedContent
         ) {
           this.$toast.info("Nội dung bình luận không thay đổi.");
           this.cancelEditing(); // Hủy chế độ chỉnh sửa nếu không có thay đổi
@@ -559,9 +566,13 @@ export default {
       }
     },
     async fetchUserDetails(comments) {
+      const blogUserId = this.blog.blogUserId; // Lấy ID của chủ blog
+
       const userIdsToFetch = comments
         .map((comment) => comment.cmtUserId)
-        .filter((userId) => !this.userCache[userId]); // Chỉ lấy những user chưa có trong cache
+        .filter(
+          (userId) => userId !== blogUserId && !this.userCache[userId] // Bỏ qua chủ blog & user đã cache
+        );
 
       if (userIdsToFetch.length === 0) return; // Nếu tất cả user đã có trong cache thì không gọi API
 

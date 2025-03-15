@@ -5,8 +5,8 @@ import { useAuthStore } from "@/stores/pina"; // Import store Pinia
 const toast = useToast();
 
 export const api = axios.create({
-    // baseURL: 'http://localhost:8080/',
-    baseURL: 'http://192.168.56.1:8080/',
+    baseURL: 'http://localhost:8080/',
+    // baseURL: 'http://192.168.56.1:8080/',
     withCredentials: true, // 🌟 Cho phép gửi cookie
     headers: {
         "Content-Type": "application/json",
@@ -28,9 +28,18 @@ export const api = axios.create({
 // });
 
 // 🚀 Interceptor response: Xử lý lỗi, tự động đăng xuất khi token hết hạn
+let lastToastTime = 0;
+const TOAST_THROTTLE_TIME = 3000; // Giới hạn 3 giây giữa các lần hiển thị
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        const now = Date.now();
+        if (now - lastToastTime < TOAST_THROTTLE_TIME) {
+            return Promise.reject(error); // Bỏ qua toast nếu quá gần nhau
+        }
+        lastToastTime = now;
+
         const authStore = useAuthStore();
         if (error.response) {
             const status = error.response.status;
@@ -51,3 +60,4 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+

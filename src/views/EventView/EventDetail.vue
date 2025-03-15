@@ -586,7 +586,8 @@ export default {
       const now = new Date();
       const eventDate = new Date(this.event.eventStartDate);
       const diffTime = eventDate.getTime() - now.getTime();
-      const diffDays = diffTime / (1000 * 3600 * 24);
+      const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // Làm tròn lên
+
       return diffDays <= 7 && diffDays >= 0;
     },
   },
