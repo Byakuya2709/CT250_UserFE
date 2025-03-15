@@ -18,8 +18,7 @@
         class="p-6 border rounded-lg shadow-md bg-gray-50"
       >
         <h3 class="text-xl font-semibold text-gray-800 mb-2">
-          Đánh giá từ sự kiện/vé: {{ feedback.eventId }} /
-          {{ feedback.ticketId }}
+          Đánh giá từ vé: {{ feedback.eventId }} 
         </h3>
 
         <div class="flex items-center mb-2">
