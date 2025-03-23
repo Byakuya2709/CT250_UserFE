@@ -167,13 +167,13 @@
                 @click="saveEditedComment(comment.cmtId)"
                 class="text-green-500 text-sm hover:underline mr-2"
               >
-                Lưu
+              <i class="fa-solid fa-floppy-disk"></i>
               </button>
               <button
                 @click="cancelEditing"
                 class="text-gray-500 text-sm hover:underline mr-2"
               >
-                Hủy
+              <i class="fa-solid fa-xmark"></i>
               </button>
             </template>
 
@@ -182,15 +182,15 @@
                 @click="startEditing(comment)"
                 class="text-blue-500 text-sm hover:underline mr-2"
               >
-                Chỉnh sửa
+              <i class="fa-solid fa-pen"></i>
               </button>
             </template>
 
-            <button
+            <button v-if="editingCommentId !== comment.cmtId"
               @click="deleteComment(comment.cmtId)"
               class="text-red-500 text-sm hover:underline"
             >
-              Xóa
+            <i class="fa-solid fa-trash"></i>
             </button>
           </div>
         </div>

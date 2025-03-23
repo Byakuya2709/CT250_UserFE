@@ -130,9 +130,9 @@
           >
             Thanh toán ngay
           </button>
-         
         </div>
-        <div
+        <div class="d-flex" style="justify-content: center; align-items: center; gap: 10px;">
+          <div
           v-if="
             ticket.ticketStatus === 'PAID' &&
             new Date(ticket.ticketExpiredTime) <= new Date() &&
@@ -146,17 +146,21 @@
           >
             Đánh giá sự kiện
           </button>
-          
         </div>
-        <div v-if="ticket.ticketStatus === 'PAID' && ticket.isRating == false" class="mt-4 flex justify-center"> 
+
+        <div
+          v-if="ticket.ticketStatus === 'PAID' && ticket.isRating == false"
+          class="mt-4 flex justify-center"
+        >
           <button
             @click="getMail(ticket)"
             class="px-4 py-2 bg-yellow-500 text-white rounded-lg"
           >
             Gửi mail
           </button>
-
-          </div>
+        </div>
+        </div>
+    
       </div>
     </div>
 
@@ -270,7 +274,7 @@ export default {
     async getMail(ticket) {
       console.log(ticket);
       try {
-        const res = await api.post(`/users/tickets/email`,ticket);
+        const res = await api.post(`/users/tickets/email`, ticket);
         this.$toast.success(res.data.message);
       } catch (error) {
         this.$toast.error(error.response?.data?.message || "Đã xảy ra lỗi");

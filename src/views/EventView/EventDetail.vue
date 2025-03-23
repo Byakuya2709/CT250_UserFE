@@ -205,7 +205,7 @@
         <!-- Nội dung blog -->
         <div class="flex justify-between items-center">
           <h2 class="text-lg font-semibold">
-            {{ blog.blogUserId || "Ẩn danh" }}
+            {{ blog.blogSubject || "Ẩn danh" }}
           </h2>
           <p class="text-sm text-gray-500">
             {{ new Date(blog.blogCreateDate).toLocaleDateString() }}
